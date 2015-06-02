@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PseudoColorWidget</class>
+ <widget class="QWidget" name="PseudoColorWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>153</width>
+    <height>113</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PseudoColorWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="ColorTableWidget" name="colorTableWidget" native="true"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="maxValueLayout">
+     <item>
+      <widget class="QLabel" name="maxValueLabel">
+       <property name="text">
+        <string>max</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ObservedDoubleSpinBox" name="maxValueSpinBox">
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="minimum">
+        <double>-999999.999998999992386</double>
+       </property>
+       <property name="maximum">
+        <double>999999.999998999992386</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="minValueLayout">
+     <item>
+      <widget class="QLabel" name="minValueLabel">
+       <property name="text">
+        <string>min</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ObservedDoubleSpinBox" name="minValueSpinBox">
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="minimum">
+        <double>-999999.999998999992386</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="ObservedPushButton" name="autoScalePushButton">
+     <property name="text">
+      <string>AutoScale</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ObservedDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>ObservedDoubleSpinBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ObservedPushButton</class>
+   <extends>QPushButton</extends>
+   <header>ObservedPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ColorTableWidget</class>
+   <extends>QWidget</extends>
+   <header>ColorTableWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
