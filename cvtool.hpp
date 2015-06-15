@@ -5,6 +5,8 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <assert.h>
+
 #define OPENCV_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 #define OPENCV_VERSION_CODE OPENCV_VERSION(CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION)
 
