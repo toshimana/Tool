@@ -13,6 +13,20 @@ template<typename T>
 class cvcsv2
 {
 public:
+	struct my_real_policies : public qi::real_policies<T>
+	{
+		template <typename Iterator, typename Attribute>
+		static bool parse_nan( Iterator& first, Iterator const& last, Attribute& attr )
+		{
+			if ( first == last ) return false;
+			if ( qi::detail::string_parse( "#ind", "#IND", first, last, qi::unused ) ) {
+				while ( *first == '0' ) ++first;
+				return true;
+			}
+			return false;
+		}
+	};
+
 	template<typename Iterator>
 	struct parseCSV
 		: qi::grammar < Iterator, std::vector<T>() >
@@ -30,7 +44,7 @@ public:
 			start = line % qi::eol >> *qi::eol;
 			line %= ( elt % delim >> *delim )[++boost::phoenix::ref(rows)];
 			delim = qi::lit(',') | qi::lit(' ') | qi::lit(';');
-			elt = qi::real_parser<T>();
+			elt = qi::real_parser<T, my_real_policies>();
 		}
 	};
 
@@ -49,8 +63,6 @@ public:
 			, cols( _cols )
 		{
 			start = karma::repeat(cols)[elt << delim] % karma::eol << karma::eol;
-//			start = line % karma::eol << karma::eol;
-//			line %= ( elt % delim << delim );
 			delim = karma::lit(',');
 			elt   = karma::real_generator<T>();
 		}
