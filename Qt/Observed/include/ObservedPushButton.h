@@ -13,10 +13,12 @@ public:
 	ObservedPushButton( QWidget* parent = 0 );
 	virtual ~ObservedPushButton();
 
-	void connectPressed( std::function<void( void )> func );
+	void connectPressed ( std::function<void( void )> func );
+	void connectReleased( std::function<void( void )> func );
 
 private slots:
     void on_pressed( void );
+	void on_released( void );
 
 private:
 	struct Impl;
