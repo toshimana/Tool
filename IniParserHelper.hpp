@@ -15,6 +15,11 @@ public:
 	void read( const std::string& path )
 	{
 		boost::property_tree::ptree tree;
+		read( path, tree );
+	}
+
+	void read( const std::string& path, boost::property_tree::ptree& tree )
+	{
 		try {
 			boost::property_tree::read_ini( path, tree );
 		}
@@ -29,6 +34,7 @@ public:
 	{
 		std::cout << '[' << section << ']' << std::endl;
 		read_impl( tree );
+		std::cout << std::endl;
 	}
 
 	virtual void read_impl( const boost::property_tree::ptree& tree ) = 0;
