@@ -55,4 +55,16 @@ namespace stltool
 			dst.insert( dst.end(), src[i].begin(), src[i].end() );
 		}
 	}
+
+	template <typename Container>
+	void splitAt( size_t firstSize, const Container& input, Container& first, Container& second )
+	{
+		size_t secondSize = input.size() - firstSize;
+
+		first.resize( firstSize );
+		std::copy( input.begin(), input.begin()+firstSize, first.begin() );
+
+		second.resize( secondSize );
+		std::copy( input.begin()+firstSize, input.end(), second.begin() );
+	}
 };
