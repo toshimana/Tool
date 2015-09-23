@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-namespace numerictool 
+namespace stltool
 {
 	// STL—paccumulate‚ÌWrapper
 	template <typename Container, class T>

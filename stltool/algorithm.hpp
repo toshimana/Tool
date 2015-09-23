@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace algorithmtool 
+namespace stltool 
 {
 	// STL—pcount_if‚ÌWrapper
 	template <typename Container, typename Predicate>
