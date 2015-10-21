@@ -7,6 +7,8 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/support/date_time.hpp>
 
+#include "LoggerParam.hpp"
+
 namespace boosttool
 {
 	class Logger
@@ -23,7 +25,6 @@ namespace boosttool
 
 			logging::add_file_log(
 				keywords::auto_flush = true,
-				keywords::open_mode = std::ios::app,
 				keywords::file_name = "%Y%m%d_%5N.log",
 				keywords::target = "log",
 				keywords::time_based_rotation = sinks::file::rotation_at_time_point( 0, 0, 0 ),
@@ -40,6 +41,15 @@ namespace boosttool
 		~Logger()
 		{
 			BOOST_LOG_TRIVIAL( info ) << "------------ END   SYSTEM ------------";
+		}
+
+		void initialize( const std::string& path, boost::property_tree::ptree& tree )
+		{
+			LoggerParam param;
+			param.read( path, tree );
+
+			// Filter‚ÌÝ’è
+			boost::log::core::get()->set_filter( boost::log::trivial::severity >= param.severity_level );
 		}
 	};
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <boost/property_tree/ini_parser.hpp>
+#include <boost/log/trivial.hpp>
 
 class IniParserHelper
 {
@@ -25,16 +25,14 @@ public:
 		}
 		catch ( std::exception& e )
 		{
-			std::cerr << e.what() << std::endl;
+			BOOST_LOG_TRIVIAL( warning ) << e.what();
 		}
 		read( tree );
 	}
 
 	void read( const boost::property_tree::ptree& tree )
 	{
-		std::cout << '[' << section << ']' << std::endl;
 		read_impl( tree );
-		std::cout << std::endl;
 	}
 
 	virtual void read_impl( const boost::property_tree::ptree& tree ) = 0;
