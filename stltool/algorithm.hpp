@@ -11,7 +11,28 @@ namespace stltool
 		return std::count_if( container.begin(), container.end(), pred );
 	}
 
-	// 
+	// STL—psort‚ÌWrapper
+	template <typename Container>
+	void sort( const Container& input, Container& output )
+	{
+		output.resize( input.size() );
+		std::copy( input.begin(), input.end(), output.begin() );
+
+		std::sort( output.begin(), output.end() );
+	}
+
+	// STL—psort‚ÌWrapper
+	template <typename Container, typename Compare>
+	void sort( const Container& input, Container& output, Compare comp )
+	{
+		output.resize( input.size() );
+		std::copy( input.begin(), input.end(), output.begin() );
+
+		std::sort( output.begin(), output.end(), comp );
+	}
+
+
+	// STL—pshuffle‚ÌWrapper
 	template <typename Container >
 	void shuffle( const Container& input, Container& output )
 	{
