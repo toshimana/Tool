@@ -8,7 +8,7 @@ namespace stltool
 
 	// STL—pcopy‚ÌWrapper
 	template <typename Container1, typename Container2>
-	void copy( Container1 src, Container2 dst )
+	void copy( const Container1& src, Container2& dst )
 	{
 		dst.resize( src.size() );
 		std::copy( src.begin(), src.end(), dst.begin() );
@@ -24,7 +24,7 @@ namespace stltool
 
 	// STL—pfor_each‚ÌWrapper
 	template <typename Container, typename Func>
-	void for_each( Container container, Func func )
+	void for_each( Container& container, Func func )
 	{
 		std::for_each( container.begin(), container.end(), func );
 	}
