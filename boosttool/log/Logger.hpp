@@ -25,6 +25,7 @@ namespace boosttool
 
 			logging::add_file_log(
 				keywords::auto_flush = true,
+				keywords::open_mode = std::ios::app,
 				keywords::file_name = "%Y%m%d_%5N.log",
 				keywords::target = "log",
 				keywords::time_based_rotation = sinks::file::rotation_at_time_point( 0, 0, 0 ),
