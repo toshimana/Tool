@@ -42,14 +42,13 @@ struct ImageWidget::Impl
 	boost::signals2::signal<void (const double)>   changedScale;
 	boost::signals2::signal<void (const cv::Mat&)> changedImage;
 
-	std::vector<SpQCVImage> displayImages;
 	QTransform matrix;
 	int     scaleIndex;          //拡大率テーブルのインデックス
 	QPointF scaleChangePosition; //拡大・縮小時の中心位置
 	QPoint* shiftPrePosition;    //平行移動量計算用の位置
 
 	void
-	CreateTransformMatrix( const QPointF& shift = QPointF(0.0,0.0) );
+	createTransformMatrix( const QPointF& shift = QPointF( 0.0, 0.0 ) );
 };
 
 ImageWidget::Impl::Impl( ImageWidget* obj )
@@ -57,7 +56,6 @@ ImageWidget::Impl::Impl( ImageWidget* obj )
 	, scaleIndex( DEFAULT_SCALETABLE_INDEX )
 	, scaleChangePosition( 0.0, 0.0 )
 	, shiftPrePosition( NULL )
-	, displayImages( 1 )
 {
 
 }
@@ -67,7 +65,7 @@ ImageWidget::Impl::Impl( ImageWidget* obj )
 // 2.displayImage( displayImage->width(), displayImage->height() )
 // 3.表示サイズ( ImageWidget::width(), ImageWidget::height() )
 void
-ImageWidget::Impl::CreateTransformMatrix( const QPointF& shift )
+ImageWidget::Impl::createTransformMatrix( const QPointF& shift )
 {
 	const int w = base->width();
 	const int h = base->height();
@@ -76,7 +74,7 @@ ImageWidget::Impl::CreateTransformMatrix( const QPointF& shift )
 	double aScale = 1.0;
 	const double scale = scaleTable[scaleIndex];
 
-	QImage displayImage = displayImages[0]->getQImage();
+	QImage displayImage = base->displayImages[0]->getQImage();
 
 	const double wOffset = std::max( 0.0, (double)(w - scale*aScale*displayImage.width() )/2 );
 	const double hOffset = std::max( 0.0, (double)(h - scale*aScale*displayImage.height())/2 );
@@ -101,8 +99,8 @@ ImageWidget::Impl::CreateTransformMatrix( const QPointF& shift )
 	base->viewport()->update();
 }
 
-ImageWidget::ImageWidget( QWidget *pWnd )
-	: QGraphicsView( pWnd )
+ImageWidget::ImageWidget( QWidget* pWnd )
+	: ImageWidgetBase( pWnd )
 	, mImpl( new ImageWidget::Impl(this) )
 {
 	// マウスをクリックしていない時でも
@@ -116,29 +114,6 @@ ImageWidget::~ImageWidget( void )
 } 
 
 void
-ImageWidget::setImage( cv::InputArray src, const int index )
-{
-	if ( mImpl->displayImages.size() <= index ) {
-		mImpl->displayImages.resize( index + 1 );
-	}
-
-	mImpl->displayImages[index] = QCVImage::create( src );
-
-	mImpl->CreateTransformMatrix();
-
-	// メイン画像が更新されたなら、接続関数を実行する
-	if ( index == 0 ) {
-		mImpl->changedImage( mImpl->displayImages[index]->getRawImage() );
-	}
-}
-
-cv::Mat
-ImageWidget::getImage( const int index )
-{
-	return mImpl->displayImages[index]->getRawImage();
-}
-
-void
 ImageWidget::setScaleIndex( const int index )
 {
 	if ( index < 0 || ( NUM_SCALETABLE-1 < index ) ) {
@@ -147,7 +122,13 @@ ImageWidget::setScaleIndex( const int index )
 		mImpl->scaleIndex = index;
 	}
 	mImpl->changedScale( scaleTable[mImpl->scaleIndex] );
-	mImpl->CreateTransformMatrix();
+	mImpl->createTransformMatrix();
+}
+
+void 
+ImageWidget::createTransformMatrix( void )
+{
+	mImpl->createTransformMatrix();
 }
 
 double
@@ -185,16 +166,16 @@ ImageWidget::paintEvent( QPaintEvent* event )
 {
 	QPainter widgetpainter( viewport() );
 	widgetpainter.setTransform( mImpl->matrix );
-	for( int i = 0, n = mImpl->displayImages.size(); i < n; ++i ) {
-		widgetpainter.drawImage( 0, 0, mImpl->displayImages[i]->getQImage() );
+	for( int i = 0, n = displayImages.size(); i < n; ++i ) {
+		widgetpainter.drawImage( 0, 0, displayImages[i]->getQImage() );
 	}
 }
 
 void
 ImageWidget::resizeEvent( QResizeEvent* event )
 {
-	if ( !( mImpl->displayImages[0]->getRawImage().empty() ) ) {
-		mImpl->CreateTransformMatrix();
+	if ( !( displayImages[0]->getRawImage().empty() ) ) {
+		mImpl->createTransformMatrix();
 	}
 }
 
@@ -230,11 +211,11 @@ void
 ImageWidget::mouseMoveEvent( QMouseEvent* event )
 {
 
-	if ( !( mImpl->displayImages[0]->getRawImage().empty() ) ) {
+	if ( !( displayImages[0]->getRawImage().empty() ) ) {
 		// 平行移動計算を実施する
 		if ( mImpl->shiftPrePosition != NULL ) {
 			const QPointF diff = event->pos() - *(mImpl->shiftPrePosition);
-			mImpl->CreateTransformMatrix(diff);
+			mImpl->createTransformMatrix(diff);
 
 			*(mImpl->shiftPrePosition) = event->pos();
 		}

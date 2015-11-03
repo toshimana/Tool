@@ -1,23 +1,17 @@
 #ifndef IMAGEFITWIDGET_H
 #define IMAGEFITWIDGET_H
 
-#include <QGraphicsView>
+#include "ImageWidgetBase.h"
 #include <opencv2/core/core.hpp>
 #include <functional>
 #include <memory>
 
-class ImageFitWidget : public QGraphicsView
+class ImageFitWidget : public ImageWidgetBase
 {
     Q_OBJECT
 public:
     ImageFitWidget( QWidget* pWnd );
 	virtual ~ImageFitWidget( void );
-
-    void 
-	setImage( cv::InputArray img, const int index = 0 );
-
-	cv::Mat
-	getImage( const int index = 0 );
 
 	void
 	connectClickedPoint( std::function<void (const QPoint&)> func );
@@ -33,6 +27,8 @@ signals:
 public slots:
 
 protected:
+	void createTransformMatrix( void );
+
     void paintEvent( QPaintEvent* event );
 	void resizeEvent( QResizeEvent* event );
 	void mousePressEvent( QMouseEvent* event );

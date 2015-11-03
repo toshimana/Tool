@@ -1,7 +1,4 @@
 #include "ImageFitWidget.h"
-#include "QCVImage.h"
-
-#include <boost/signals2/signal.hpp>
 
 #include <QtDebug>
 #include <QMouseEvent>
@@ -14,47 +11,20 @@ struct ImageFitWidget::Impl
 	boost::signals2::signal<void (const QPoint&)>  changedClickedPointOnImage;
 	boost::signals2::signal<void (const QPoint&)>  changedMouseMovePointOnImage;
 	boost::signals2::signal<void (const double)>   changedScale;
-	boost::signals2::signal<void (const cv::Mat&)> changedImage;
 
-	std::vector<SpQCVImage>  displayImages;
 	QTransform matrix;
 	QPoint* shiftPrePosition;    //平行移動量計算用の位置
-
-	void
-	CreateTransformMatrix( void );
 };
 
 ImageFitWidget::Impl::Impl( ImageFitWidget* obj )
 	: base( obj )
 	, shiftPrePosition( NULL )
-	, displayImages( 1 )
 {
 
-}
-
-// 以下の値が変更されたときに実行する 
-// 1.scaleIndex
-// 2.displayImage( displayImage->width(), displayImage->height() )
-// 3.表示サイズ( ImageWidget::width(), ImageWidget::height() )
-void
-ImageFitWidget::Impl::CreateTransformMatrix( void )
-{
-	QImage displayImage = displayImages[0]->getQImage();
-
-	int imageWidth  = displayImage.width();
-	int imageHeight = displayImage.height();
-	double scale = std::min( base->width() / static_cast<double>(imageWidth), base->height() / static_cast<double>(imageHeight) );
-
-	QTransform trans;
-	trans.translate( (base->width()-scale*imageWidth)/2, (base->height()-scale*imageHeight)/2 ); // 画像の左上の位置
-	trans.scale( scale, scale );
-	
-	matrix = trans;
-	base->viewport()->update();
 }
 
 ImageFitWidget::ImageFitWidget( QWidget *pWnd )
-	: QGraphicsView( pWnd )
+	: ImageWidgetBase( pWnd )
 	, mImpl( new ImageFitWidget::Impl(this) )
 {
 	// マウスをクリックしていない時でも
@@ -66,27 +36,25 @@ ImageFitWidget::~ImageFitWidget( void )
 {
 } 
 
+// 以下の値が変更されたときに実行する 
+// 1.scaleIndex
+// 2.displayImage( displayImage->width(), displayImage->height() )
+// 3.表示サイズ( ImageWidget::width(), ImageWidget::height() )
 void
-ImageFitWidget::setImage( cv::InputArray src, const int index )
+ImageFitWidget::createTransformMatrix( void )
 {
-	if ( mImpl->displayImages.size() <= index ) {
-		mImpl->displayImages.resize( index + 1 );
-	}
+	QImage displayImage = displayImages[0]->getQImage();
 
-	mImpl->displayImages[index] = QCVImage::create( src );
+	int imageWidth  = displayImage.width();
+	int imageHeight = displayImage.height();
+	double scale = std::min( width() / static_cast<double>(imageWidth), height() / static_cast<double>(imageHeight) );
 
-	mImpl->CreateTransformMatrix();
-
-	// メイン画像が更新されたなら、接続関数を実行する
-	if ( index == 0 ) {
-		mImpl->changedImage( mImpl->displayImages[index]->getRawImage() );
-	}
-}
-
-cv::Mat
-ImageFitWidget::getImage( const int index )
-{
-	return mImpl->displayImages[index]->getRawImage();
+	QTransform trans;
+	trans.translate( (width()-scale*imageWidth)/2, (height()-scale*imageHeight)/2 ); // 画像の左上の位置
+	trans.scale( scale, scale );
+	
+	mImpl->matrix = trans;
+	viewport()->update();
 }
 
 void
@@ -104,7 +72,7 @@ ImageFitWidget::connectChangedMouseMove( std::function<void (const QPoint&)> fun
 void
 ImageFitWidget::connectChangedImage( std::function<void (const cv::Mat&)> func )
 {
-	mImpl->changedImage.connect( func );
+	changedImage.connect( func );
 }
 
 void
@@ -112,16 +80,16 @@ ImageFitWidget::paintEvent( QPaintEvent* event )
 {
 	QPainter widgetpainter( viewport() );
 	widgetpainter.setTransform( mImpl->matrix );
-	for( int i = 0, n = mImpl->displayImages.size(); i < n; ++i ) {
-		widgetpainter.drawImage( 0, 0, mImpl->displayImages[i]->getQImage() );
+	for( int i = 0, n = displayImages.size(); i < n; ++i ) {
+		widgetpainter.drawImage( 0, 0, displayImages[i]->getQImage() );
 	}
 }
 
 void
 ImageFitWidget::resizeEvent( QResizeEvent* event )
 {
-	if ( !( mImpl->displayImages[0]->getRawImage().empty() ) ) {
-		mImpl->CreateTransformMatrix();
+	if ( !( displayImages[0]->getRawImage().empty() ) ) {
+		createTransformMatrix();
 	}
 }
 
@@ -157,7 +125,7 @@ void
 ImageFitWidget::mouseMoveEvent( QMouseEvent* event )
 {
 
-	if ( !(mImpl->displayImages[0]->getRawImage().empty() ) ) {
+	if ( !( displayImages[0]->getRawImage().empty() ) ) {
 		// 画像上の座標を出力する
 		qreal postX, postY;
 		mImpl->matrix.inverted().map( event->x(), event->y(), &postX, &postY );

@@ -1,22 +1,16 @@
 #ifndef IMAGEWIDGET_H
 #define IMAGEWIDGET_H
 
-#include <QGraphicsView>
+#include "ImageWidgetBase.h"
 #include <opencv2/core/core.hpp>
 #include <functional>
 
-class ImageWidget : public QGraphicsView
+class ImageWidget : public ImageWidgetBase
 {
     Q_OBJECT
 public:
     ImageWidget( QWidget* pWnd );
 	virtual ~ImageWidget( void );
-
-    void 
-	setImage( cv::InputArray img, const int index = 0 );
-
-	cv::Mat
-	getImage( const int index = 0 );
 
 	void
 	setScaleIndex( const int index = -1);
@@ -41,6 +35,8 @@ signals:
 public slots:
 
 protected:
+	void createTransformMatrix( void );
+
     void paintEvent( QPaintEvent* event );
 	void resizeEvent( QResizeEvent* event );
 	void mousePressEvent( QMouseEvent* event );
