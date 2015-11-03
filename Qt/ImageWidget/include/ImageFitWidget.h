@@ -13,15 +13,6 @@ public:
     ImageFitWidget( QWidget* pWnd );
 	virtual ~ImageFitWidget( void );
 
-	void
-	connectClickedPoint( std::function<void (const QPoint&)> func );
-
-	void
-	connectChangedMouseMove( std::function<void (const QPoint&)> func );
-
-	void
-	connectChangedImage( std::function<void (const cv::Mat&)> func );
-
 signals:
 
 public slots:

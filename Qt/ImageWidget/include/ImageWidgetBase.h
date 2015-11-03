@@ -18,11 +18,22 @@ public:
 	cv::Mat
 	getImage( const int index = 0 );
 
+	void
+	connectChangedImage( std::function<void (const cv::Mat&)> func );
+
+	void
+	connectClickedPoint( std::function<void (const QPoint&)> func );
+
+	void
+	connectChangedMouseMove( std::function<void (const QPoint&)> func );
+
 protected:
 	std::vector<SpQCVImage> displayImages;
 	QTransform matrix;
 
 	boost::signals2::signal<void(const cv::Mat&)> changedImage;
+	boost::signals2::signal<void(const QPoint&)>  changedClickedPointOnImage;
+	boost::signals2::signal<void(const QPoint&)>  changedMouseMovePointOnImage;
 
 	virtual void createTransformMatrix( void ) = 0;
 

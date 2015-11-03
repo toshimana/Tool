@@ -19,16 +19,7 @@ public:
 	getScale( void ) const;
 
 	void
-	connectClickedPoint( std::function<void (const QPoint&)> func );
-
-	void
-	connectChangedMouseMove( std::function<void (const QPoint&)> func );
-
-	void
 	connectChangedScale( std::function<void (const double)> func );
-
-	void
-	connectChangedImage( std::function<void (const cv::Mat&)> func );
 
 signals:
 

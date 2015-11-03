@@ -37,10 +37,7 @@ struct ImageWidget::Impl
 	Impl( ImageWidget* obj);
 	ImageWidget* base;
 
-	boost::signals2::signal<void (const QPoint&)>  changedClickedPointOnImage;
-	boost::signals2::signal<void (const QPoint&)>  changedMouseMovePointOnImage;
 	boost::signals2::signal<void (const double)>   changedScale;
-	boost::signals2::signal<void (const cv::Mat&)> changedImage;
 
 	int     scaleIndex;          //拡大率テーブルのインデックス
 	QPointF scaleChangePosition; //拡大・縮小時の中心位置
@@ -137,27 +134,9 @@ ImageWidget::getScale( void ) const
 }
 
 void
-ImageWidget::connectClickedPoint( std::function<void (const QPoint&)> func )
-{
-	mImpl->changedClickedPointOnImage.connect( func );
-}
-
-void
-ImageWidget::connectChangedMouseMove( std::function<void (const QPoint&)> func )
-{
-	mImpl->changedMouseMovePointOnImage.connect( func );
-}
-
-void
 ImageWidget::connectChangedScale( std::function<void (const double)> func )
 {
 	mImpl->changedScale.connect( func );
-}
-
-void
-ImageWidget::connectChangedImage( std::function<void (const cv::Mat&)> func )
-{
-	mImpl->changedImage.connect( func );
 }
 
 void
@@ -173,7 +152,7 @@ ImageWidget::mousePressEvent( QMouseEvent* event )
 		{
 			qreal postX, postY;
 			matrix.inverted().map( event->x(), event->y(), &postX, &postY );
-			mImpl->changedClickedPointOnImage( QPoint(floor(postX), floor(postY) ) );
+			changedClickedPointOnImage( QPoint( floor( postX ), floor( postY ) ) );
 		} break;
 	}
 }
@@ -204,7 +183,7 @@ ImageWidget::mouseMoveEvent( QMouseEvent* event )
 		// 画像上の座標を出力する
 		qreal postX, postY;
 		matrix.inverted().map( event->x(), event->y(), &postX, &postY );
-		mImpl->changedMouseMovePointOnImage( QPoint(floor(postX), floor(postY) ) );
+		changedMouseMovePointOnImage( QPoint( floor( postX ), floor( postY ) ) );
 	}
 }
 

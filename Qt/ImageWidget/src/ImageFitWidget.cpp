@@ -8,8 +8,6 @@ struct ImageFitWidget::Impl
 	Impl( ImageFitWidget* obj);
 	ImageFitWidget* base;
 
-	boost::signals2::signal<void (const QPoint&)>  changedClickedPointOnImage;
-	boost::signals2::signal<void (const QPoint&)>  changedMouseMovePointOnImage;
 	boost::signals2::signal<void (const double)>   changedScale;
 
 	QPoint* shiftPrePosition;    //平行移動量計算用の位置
@@ -57,24 +55,6 @@ ImageFitWidget::createTransformMatrix( void )
 }
 
 void
-ImageFitWidget::connectClickedPoint( std::function<void (const QPoint&)> func )
-{
-	mImpl->changedClickedPointOnImage.connect( func );
-}
-
-void
-ImageFitWidget::connectChangedMouseMove( std::function<void (const QPoint&)> func )
-{
-	mImpl->changedMouseMovePointOnImage.connect( func );
-}
-
-void
-ImageFitWidget::connectChangedImage( std::function<void (const cv::Mat&)> func )
-{
-	changedImage.connect( func );
-}
-
-void
 ImageFitWidget::mousePressEvent( QMouseEvent* event )
 {
 	switch ( event->button() ) {
@@ -87,7 +67,7 @@ ImageFitWidget::mousePressEvent( QMouseEvent* event )
 		{
 			qreal postX, postY;
 			matrix.inverted().map( event->x(), event->y(), &postX, &postY );
-			mImpl->changedClickedPointOnImage( QPoint(floor(postX), floor(postY) ) );
+			changedClickedPointOnImage( QPoint(floor(postX), floor(postY) ) );
 		} break;
 	}
 }
@@ -110,7 +90,7 @@ ImageFitWidget::mouseMoveEvent( QMouseEvent* event )
 		// 画像上の座標を出力する
 		qreal postX, postY;
 		matrix.inverted().map( event->x(), event->y(), &postX, &postY );
-		mImpl->changedMouseMovePointOnImage( QPoint(floor(postX), floor(postY) ) );
+		changedMouseMovePointOnImage( QPoint( floor( postX ), floor( postY ) ) );
 	}
 }
 

@@ -48,3 +48,22 @@ ImageWidgetBase::resizeEvent( QResizeEvent* event )
 		createTransformMatrix();
 	}
 }
+
+void
+ImageWidgetBase::connectClickedPoint( std::function<void (const QPoint&)> func )
+{
+	changedClickedPointOnImage.connect( func );
+}
+
+void
+ImageWidgetBase::connectChangedMouseMove( std::function<void (const QPoint&)> func )
+{
+	changedMouseMovePointOnImage.connect( func );
+}
+
+void
+ImageWidgetBase::connectChangedImage( std::function<void (const cv::Mat&)> func )
+{
+	changedImage.connect( func );
+}
+
