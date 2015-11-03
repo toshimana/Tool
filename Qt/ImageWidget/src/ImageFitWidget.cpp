@@ -1,5 +1,5 @@
 #include "ImageFitWidget.h"
-#include <opencv2/imgproc/imgproc.hpp>
+#include "QCVImage.h"
 
 #include <boost/signals2/signal.hpp>
 
@@ -16,7 +16,7 @@ struct ImageFitWidget::Impl
 	boost::signals2::signal<void (const double)>   changedScale;
 	boost::signals2::signal<void (const cv::Mat&)> changedImage;
 
-	std::vector<QImage>  displayImages;
+	std::vector<SpQCVImage>  displayImages;
 	QTransform matrix;
 	QPoint* shiftPrePosition;    //平行移動量計算用の位置
 
@@ -39,8 +39,10 @@ ImageFitWidget::Impl::Impl( ImageFitWidget* obj )
 void
 ImageFitWidget::Impl::CreateTransformMatrix( void )
 {
-	int imageWidth  = displayImages[0].width();
-	int imageHeight = displayImages[0].height();
+	QImage displayImage = displayImages[0]->getQImage();
+
+	int imageWidth  = displayImage.width();
+	int imageHeight = displayImage.height();
 	double scale = std::min( base->width() / static_cast<double>(imageWidth), base->height() / static_cast<double>(imageHeight) );
 
 	QTransform trans;
@@ -71,53 +73,20 @@ ImageFitWidget::setImage( cv::InputArray src, const int index )
 		mImpl->displayImages.resize( index + 1 );
 	}
 
-	cv::Mat rgbaImage;
-	switch ( src.channels() ) {
-#if OPENCV_VERSION_CODE < OPENCV_VERSION(3,0,0)
-	case 1:	cv::cvtColor( src, rgbaImage, CV_GRAY2RGBA ); break;
-	case 3:	cv::cvtColor( src, rgbaImage, CV_BGR2RGBA ); break;
-	case 4:	cv::cvtColor( src, rgbaImage, CV_BGRA2RGBA ); break;
-#else
-	case 1:	cv::cvtColor( src, rgbaImage, cv::COLOR_GRAY2RGBA ); break;
-	case 3:	cv::cvtColor( src, rgbaImage, cv::COLOR_BGR2RGBA ); break;
-	case 4:	cv::cvtColor( src, rgbaImage, cv::COLOR_BGRA2RGBA ); break;
-#endif
-		default: break;
-	}
-
-	mImpl->displayImages[index] = 
-		QImage(rgbaImage.ptr(),rgbaImage.cols,rgbaImage.rows,rgbaImage.step,QImage::Format_RGBA8888 ).copy();
+	mImpl->displayImages[index] = QCVImage::create( src );
 
 	mImpl->CreateTransformMatrix();
 
 	// メイン画像が更新されたなら、接続関数を実行する
 	if ( index == 0 ) {
-		cv::Mat bgrImage;
-#if OPENCV_VERSION_CODE < OPENCV_VERSION(3,0,0)
-		cv::cvtColor(rgbaImage, bgrImage, CV_RGBA2BGR);
-#else
-		cv::cvtColor(rgbaImage, bgrImage, cv::COLOR_RGBA2BGR);
-#endif
-		mImpl->changedImage( bgrImage );
+		mImpl->changedImage( mImpl->displayImages[index]->getRawImage() );
 	}
 }
 
 cv::Mat
 ImageFitWidget::getImage( const int index )
 {
-	QImage displayImage = mImpl->displayImages[index];
-
-	cv::Mat rgba(displayImage.height(), displayImage.width(), CV_8UC4,
-		displayImage.bits(),
-		displayImage.bytesPerLine());
-
-	cv::Mat bgr;
-#if OPENCV_VERSION_CODE < OPENCV_VERSION(3,0,0)
-	cv::cvtColor( rgba, bgr, CV_RGBA2BGR );
-#else
-	cv::cvtColor( rgba, bgr, cv::COLOR_RGBA2BGR );
-#endif
-	return bgr;
+	return mImpl->displayImages[index]->getRawImage();
 }
 
 void
@@ -144,14 +113,14 @@ ImageFitWidget::paintEvent( QPaintEvent* event )
 	QPainter widgetpainter( viewport() );
 	widgetpainter.setTransform( mImpl->matrix );
 	for( int i = 0, n = mImpl->displayImages.size(); i < n; ++i ) {
-		widgetpainter.drawImage( 0, 0, mImpl->displayImages[i] );
+		widgetpainter.drawImage( 0, 0, mImpl->displayImages[i]->getQImage() );
 	}
 }
 
 void
 ImageFitWidget::resizeEvent( QResizeEvent* event )
 {
-	if ( mImpl->displayImages[0].width() != 0 ) {
+	if ( !( mImpl->displayImages[0]->getRawImage().empty() ) ) {
 		mImpl->CreateTransformMatrix();
 	}
 }
@@ -188,7 +157,7 @@ void
 ImageFitWidget::mouseMoveEvent( QMouseEvent* event )
 {
 
-	if ( mImpl->displayImages[0].width() != 0 ) {
+	if ( !(mImpl->displayImages[0]->getRawImage().empty() ) ) {
 		// 画像上の座標を出力する
 		qreal postX, postY;
 		mImpl->matrix.inverted().map( event->x(), event->y(), &postX, &postY );
