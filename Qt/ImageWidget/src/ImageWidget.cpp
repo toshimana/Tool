@@ -42,7 +42,6 @@ struct ImageWidget::Impl
 	boost::signals2::signal<void (const double)>   changedScale;
 	boost::signals2::signal<void (const cv::Mat&)> changedImage;
 
-	QTransform matrix;
 	int     scaleIndex;          //拡大率テーブルのインデックス
 	QPointF scaleChangePosition; //拡大・縮小時の中心位置
 	QPoint* shiftPrePosition;    //平行移動量計算用の位置
@@ -70,7 +69,7 @@ ImageWidget::Impl::createTransformMatrix( const QPointF& shift )
 	const int w = base->width();
 	const int h = base->height();
 
-	const QPointF baseP = matrix.inverted().map( scaleChangePosition );
+	const QPointF baseP = base->matrix.inverted().map( scaleChangePosition );
 	double aScale = 1.0;
 	const double scale = scaleTable[scaleIndex];
 
@@ -95,7 +94,7 @@ ImageWidget::Impl::createTransformMatrix( const QPointF& shift )
 		if ( bottom+ceil(hOffset) < h                   ) trans.translate( 0.0,                                    (h-bottom-ceil(hOffset))/(scale*aScale) );
 	}
 
-	matrix = trans;
+	base->matrix = trans;
 	base->viewport()->update();
 }
 
@@ -162,24 +161,6 @@ ImageWidget::connectChangedImage( std::function<void (const cv::Mat&)> func )
 }
 
 void
-ImageWidget::paintEvent( QPaintEvent* event )
-{
-	QPainter widgetpainter( viewport() );
-	widgetpainter.setTransform( mImpl->matrix );
-	for( int i = 0, n = displayImages.size(); i < n; ++i ) {
-		widgetpainter.drawImage( 0, 0, displayImages[i]->getQImage() );
-	}
-}
-
-void
-ImageWidget::resizeEvent( QResizeEvent* event )
-{
-	if ( !( displayImages[0]->getRawImage().empty() ) ) {
-		mImpl->createTransformMatrix();
-	}
-}
-
-void
 ImageWidget::mousePressEvent( QMouseEvent* event )
 {
 	switch ( event->button() ) {
@@ -191,7 +172,7 @@ ImageWidget::mousePressEvent( QMouseEvent* event )
 	case Qt::LeftButton:
 		{
 			qreal postX, postY;
-			mImpl->matrix.inverted().map( event->x(), event->y(), &postX, &postY );
+			matrix.inverted().map( event->x(), event->y(), &postX, &postY );
 			mImpl->changedClickedPointOnImage( QPoint(floor(postX), floor(postY) ) );
 		} break;
 	}
@@ -222,7 +203,7 @@ ImageWidget::mouseMoveEvent( QMouseEvent* event )
 
 		// 画像上の座標を出力する
 		qreal postX, postY;
-		mImpl->matrix.inverted().map( event->x(), event->y(), &postX, &postY );
+		matrix.inverted().map( event->x(), event->y(), &postX, &postY );
 		mImpl->changedMouseMovePointOnImage( QPoint(floor(postX), floor(postY) ) );
 	}
 }

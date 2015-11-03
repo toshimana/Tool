@@ -31,4 +31,20 @@ ImageWidgetBase::getImage( const int index )
 	return displayImages[index]->getRawImage();
 }
 
+void
+ImageWidgetBase::paintEvent( QPaintEvent* event )
+{
+	QPainter widgetpainter( viewport() );
+	widgetpainter.setTransform( matrix );
+	for( int i = 0, n = displayImages.size(); i < n; ++i ) {
+		widgetpainter.drawImage( 0, 0, displayImages[i]->getQImage() );
+	}
+}
 
+void
+ImageWidgetBase::resizeEvent( QResizeEvent* event )
+{
+	if ( !( displayImages[0]->getRawImage().empty() ) ) {
+		createTransformMatrix();
+	}
+}

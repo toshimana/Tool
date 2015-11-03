@@ -20,8 +20,12 @@ public:
 
 protected:
 	std::vector<SpQCVImage> displayImages;
+	QTransform matrix;
 
 	boost::signals2::signal<void(const cv::Mat&)> changedImage;
 
 	virtual void createTransformMatrix( void ) = 0;
+
+    void paintEvent( QPaintEvent* event );
+	void resizeEvent( QResizeEvent* event );
 };

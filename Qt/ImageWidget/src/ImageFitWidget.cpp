@@ -12,7 +12,6 @@ struct ImageFitWidget::Impl
 	boost::signals2::signal<void (const QPoint&)>  changedMouseMovePointOnImage;
 	boost::signals2::signal<void (const double)>   changedScale;
 
-	QTransform matrix;
 	QPoint* shiftPrePosition;    //平行移動量計算用の位置
 };
 
@@ -53,7 +52,7 @@ ImageFitWidget::createTransformMatrix( void )
 	trans.translate( (width()-scale*imageWidth)/2, (height()-scale*imageHeight)/2 ); // 画像の左上の位置
 	trans.scale( scale, scale );
 	
-	mImpl->matrix = trans;
+	matrix = trans;
 	viewport()->update();
 }
 
@@ -76,24 +75,6 @@ ImageFitWidget::connectChangedImage( std::function<void (const cv::Mat&)> func )
 }
 
 void
-ImageFitWidget::paintEvent( QPaintEvent* event )
-{
-	QPainter widgetpainter( viewport() );
-	widgetpainter.setTransform( mImpl->matrix );
-	for( int i = 0, n = displayImages.size(); i < n; ++i ) {
-		widgetpainter.drawImage( 0, 0, displayImages[i]->getQImage() );
-	}
-}
-
-void
-ImageFitWidget::resizeEvent( QResizeEvent* event )
-{
-	if ( !( displayImages[0]->getRawImage().empty() ) ) {
-		createTransformMatrix();
-	}
-}
-
-void
 ImageFitWidget::mousePressEvent( QMouseEvent* event )
 {
 	switch ( event->button() ) {
@@ -105,7 +86,7 @@ ImageFitWidget::mousePressEvent( QMouseEvent* event )
 	case Qt::LeftButton:
 		{
 			qreal postX, postY;
-			mImpl->matrix.inverted().map( event->x(), event->y(), &postX, &postY );
+			matrix.inverted().map( event->x(), event->y(), &postX, &postY );
 			mImpl->changedClickedPointOnImage( QPoint(floor(postX), floor(postY) ) );
 		} break;
 	}
@@ -128,7 +109,7 @@ ImageFitWidget::mouseMoveEvent( QMouseEvent* event )
 	if ( !( displayImages[0]->getRawImage().empty() ) ) {
 		// 画像上の座標を出力する
 		qreal postX, postY;
-		mImpl->matrix.inverted().map( event->x(), event->y(), &postX, &postY );
+		matrix.inverted().map( event->x(), event->y(), &postX, &postY );
 		mImpl->changedMouseMovePointOnImage( QPoint(floor(postX), floor(postY) ) );
 	}
 }
