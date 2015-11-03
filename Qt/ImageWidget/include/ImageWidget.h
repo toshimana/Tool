@@ -21,10 +21,6 @@ public:
 	void
 	connectChangedScale( std::function<void (const double)> func );
 
-signals:
-
-public slots:
-
 protected:
 	void createTransformMatrix( void );
 
@@ -34,9 +30,8 @@ protected:
 	void wheelEvent( QWheelEvent* event );
 
 private:
-
-	class Impl;
-	Impl* mImpl;
+	struct Impl;
+	std::unique_ptr<Impl> mImpl;
 };
 
 #endif // IMAGEWIDGET_H

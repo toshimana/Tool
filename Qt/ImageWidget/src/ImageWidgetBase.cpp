@@ -1,9 +1,15 @@
 #include "ImageWidgetBase.h"
 
+#include <QMouseEvent>
+
 ImageWidgetBase::ImageWidgetBase( QWidget* parent )
 	: QGraphicsView( parent )
 	, displayImages( 1 )
-{}
+{
+	// マウスをクリックしていない時でも
+	// mouseMoveEventが反応するように設定する
+	setMouseTracking( true );
+}
 
 ImageWidgetBase::~ImageWidgetBase( void )
 {}
@@ -29,6 +35,27 @@ cv::Mat
 ImageWidgetBase::getImage( const int index )
 {
 	return displayImages[index]->getRawImage();
+}
+
+// 以下の値が変更されたときに実行する 
+// 1.scaleIndex
+// 2.displayImage( displayImage->width(), displayImage->height() )
+// 3.表示サイズ( ImageWidget::width(), ImageWidget::height() )
+void
+ImageWidgetBase::createTransformMatrix( void )
+{
+	QImage displayImage = displayImages[0]->getQImage();
+
+	int imageWidth  = displayImage.width();
+	int imageHeight = displayImage.height();
+	double scale = std::min( width() / static_cast<double>(imageWidth), height() / static_cast<double>(imageHeight) );
+
+	QTransform trans;
+	trans.translate( (width()-scale*imageWidth)/2, (height()-scale*imageHeight)/2 ); // 画像の左上の位置
+	trans.scale( scale, scale );
+	
+	matrix = trans;
+	viewport()->update();
 }
 
 void
@@ -65,5 +92,29 @@ void
 ImageWidgetBase::connectChangedImage( std::function<void (const cv::Mat&)> func )
 {
 	changedImage.connect( func );
+}
+
+void
+ImageWidgetBase::mousePressEvent( QMouseEvent* event )
+{
+	switch ( event->button() ) {
+	case Qt::LeftButton:
+		{
+			qreal postX, postY;
+			matrix.inverted().map( event->x(), event->y(), &postX, &postY );
+			changedClickedPointOnImage( QPoint( floor( postX ), floor( postY ) ) );
+		} break;
+	}
+}
+
+void
+ImageWidgetBase::mouseMoveEvent( QMouseEvent* event )
+{
+	if ( !( displayImages[0]->getRawImage().empty() ) ) {
+		// 画像上の座標を出力する
+		qreal postX, postY;
+		matrix.inverted().map( event->x(), event->y(), &postX, &postY );
+		changedMouseMovePointOnImage( QPoint( floor( postX ), floor( postY ) ) );
+	}
 }
 

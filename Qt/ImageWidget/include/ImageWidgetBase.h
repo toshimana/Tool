@@ -35,8 +35,10 @@ protected:
 	boost::signals2::signal<void(const QPoint&)>  changedClickedPointOnImage;
 	boost::signals2::signal<void(const QPoint&)>  changedMouseMovePointOnImage;
 
-	virtual void createTransformMatrix( void ) = 0;
+	virtual void createTransformMatrix( void );
 
     void paintEvent( QPaintEvent* event );
 	void resizeEvent( QResizeEvent* event );
+	virtual void mousePressEvent( QMouseEvent* event );
+	virtual void mouseMoveEvent( QMouseEvent* event );
 };
