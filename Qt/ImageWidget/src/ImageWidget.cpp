@@ -7,8 +7,6 @@
 #include <QMouseEvent>
 #include <array>
 
-#include <opencv_helper.hpp>
-
 const int NUM_SCALETABLE = 16;
 const int DEFAULT_SCALETABLE_INDEX = 4;
 std::array<double, NUM_SCALETABLE> scaleTable = 
