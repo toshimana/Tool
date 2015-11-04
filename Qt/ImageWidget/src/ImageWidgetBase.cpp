@@ -4,7 +4,7 @@
 
 ImageWidgetBase::ImageWidgetBase( QWidget* parent )
 	: QGraphicsView( parent )
-	, displayImages( 1 )
+	, displayImages( 1, QCVImage::create( cv::Mat() ) )
 {
 	// マウスをクリックしていない時でも
 	// mouseMoveEventが反応するように設定する
