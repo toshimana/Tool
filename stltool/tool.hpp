@@ -67,4 +67,12 @@ namespace stltool
 		second.resize( secondSize );
 		std::copy( input.begin()+firstSize, input.end(), second.begin() );
 	}
+
+	template <typename T>
+	void append( std::vector<T>& target, const std::vector<T>& ap )
+	{
+		size_t oldSize = target.size();
+		target.resize( oldSize + ap.size() );
+		std::copy( ap.begin(), ap.end(), target.begin()+oldSize );
+	}
 };
