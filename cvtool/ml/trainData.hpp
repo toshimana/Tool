@@ -1,8 +1,10 @@
 #pragma once
 
+#include <fstream>
+
 namespace cvtool
 {
-	bool saveToCSV( const cv::Ptr<cv::ml::TrainData>& trainData, const std::string& path )
+	bool saveToCSV( const cv::Ptr<cv::ml::TrainData>& trainData, const std::string& path, std::ios_base::openmode openmode = std::ios::out )
 	{
 		int trainDataSize = trainData->getNSamples();
 		const cv::Mat samples = trainData->getSamples();
@@ -17,7 +19,7 @@ namespace cvtool
 			ss << responses.at<int>( row ) << std::endl;
 		}
 
-		std::ofstream ofs( path );
+		std::ofstream ofs( path, openmode );
 		ofs << ss.str();
 
 		return true;

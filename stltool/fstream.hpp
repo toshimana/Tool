@@ -5,9 +5,9 @@
 namespace stltool 
 { 
 	template<typename Container>
-	void saveToCSV( const Container& src, const std::string& path )
+	void saveToCSV( const Container& src, const std::string& path, std::ios_base::openmode openmode = std::ios::out )
 	{
-		std::ofstream ofs( path );
+		std::ofstream ofs( path, openmode );
 		if( !ofs.is_open() ) {
 			std::string errMsg( __FUNCTION__ ": fail to open ");
 			throw std::invalid_argument( errMsg + path );
