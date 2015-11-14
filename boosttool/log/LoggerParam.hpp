@@ -13,7 +13,7 @@ public:
 
 	void read_impl( const boost::property_tree::ptree& tree )
 	{
-		PARAM_GET( int, severity_level, 0 );
+		PARAM_GET( int, severity_level );
 	}
 
 	int severity_level;
