@@ -18,6 +18,7 @@
 #define IMREAD_GRAYSCALE cv::IMREAD_GRAYSCALE
 #define IMREAD_COLOR     cv::IMREAD_COLOR
 #define COLOR_BGR2GRAY   cv::COLOR_BGR2GRAY
+#define COLOR_GRAY2BGR   cv::COLOR_GRAY2BGR
 #endif
 
 namespace cvtool 
@@ -179,6 +180,19 @@ namespace cvtool
 		r += (chans+'0');
 
 		return r;
+	}
+
+	//============================================================================
+	//  “ü—Í‚Ìƒ`ƒƒƒlƒ‹‚ð–â‚í‚È‚¢cvtColor
+	//============================================================================
+	static void
+	convertColor( cv::InputArray src, cv::OutputArray dst )
+	{
+		switch ( src.type() ) {
+		case CV_8UC3: src.getMat().copyTo( dst ); break;
+		case CV_8UC1: cvtColor( src, dst, COLOR_GRAY2BGR ); break;
+		default     : assert( false );
+		}
 	}
 
 	//============================================================================
