@@ -14,7 +14,8 @@ namespace boosttool
 	class Logger
 	{
 	public:
-		Logger()
+		Logger( const std::string& _appName = "SYSTEM" )
+			: appName( _appName )
 		{
 			namespace logging = boost::log;
 			namespace sinks = boost::log::sinks;
@@ -36,12 +37,12 @@ namespace boosttool
 				% logging::trivial::severity
 				% expr::message);
 
-			BOOST_LOG_TRIVIAL( info ) << "------------ START SYSTEM ------------";
+			BOOST_LOG_TRIVIAL( info ) << "------------ START " << appName << " ------------";
 		}
 
 		~Logger()
 		{
-			BOOST_LOG_TRIVIAL( info ) << "------------ END   SYSTEM ------------";
+			BOOST_LOG_TRIVIAL( info ) << "------------ END   " << appName << " ------------";
 		}
 
 		void initialize( const std::string& path, boost::property_tree::ptree& tree )
@@ -52,5 +53,8 @@ namespace boosttool
 			// Filter‚ÌÝ’è
 			boost::log::core::get()->set_filter( boost::log::trivial::severity >= param.severity_level );
 		}
+
+	private:
+		const std::string& appName;
 	};
 }
