@@ -4,11 +4,11 @@
 
 #include <string>
 #include <boost/log/trivial.hpp>
+#include "../../stltool/ostream.hpp"
 
 namespace {
 
 	// vectorの自動出力用
-#include "../../stltool/ostream.hpp"
 	using namespace stltool;
 	
 	// 可変長引数を文字列に変換するクラス
