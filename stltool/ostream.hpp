@@ -11,8 +11,8 @@ namespace stltool
 	template <typename Container>
 	std::ostream& printContainer( std::ostream& o, const Container& container )
 	{
-		Container::const_iterator it  = container.begin();
-		Container::const_iterator end = container.end(); 
+		typename Container::const_iterator it  = container.begin();
+		typename Container::const_iterator end = container.end(); 
 
 		o << "[";
 		while( it != end ) {

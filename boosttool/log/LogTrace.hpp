@@ -45,4 +45,5 @@ namespace {
 	};
 }
 
-#define LOGTRACE(...) LogTrace logTrace( __FILE__, __LINE__, __FUNCTION__, LogTraceString( std::stringstream(), __VA_ARGS__ ) )
+//#define LOGTRACE(...) LogTrace logTrace( __FILE__, __LINE__, __FUNCTION__, LogTraceString( "", __VA_ARGS__ ) )
+#define LOGTRACE(...) LogTrace logTrace( __FILE__, __LINE__, __FUNCTION__, "" )

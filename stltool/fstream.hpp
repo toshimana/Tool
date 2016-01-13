@@ -9,7 +9,7 @@ namespace stltool
 	{
 		std::ofstream ofs( path, openmode );
 		if( !ofs.is_open() ) {
-			std::string errMsg( __FUNCTION__ ": fail to open ");
+			std::string errMsg( __FUNCTION__ );
 			throw std::invalid_argument( errMsg + path );
 		}
 
@@ -23,7 +23,7 @@ namespace stltool
 	{
 		std::ifstream ifs( path );
 		if( !ifs.is_open() ) {
-			std::string errMsg( __FUNCTION__ ": fail to open ");
+			std::string errMsg( __FUNCTION__ );
 			throw std::invalid_argument( errMsg + path );
 		}
 

@@ -31,6 +31,20 @@ namespace stltool
 		std::sort( output.begin(), output.end(), comp );
 	}
 
+	// STL—ptransform‚ÌWrapper
+	template <typename Container1, typename Container2, typename Func>
+	void transform( const Container1& src, Container2& dst, Func func )
+	{
+		dst.resize( src.size() );
+		std::transform( src.begin(), src.end(), dst.begin(), func );
+	}
+
+	// STL—pfor_each‚ÌWrapper
+	template <typename Container, typename Func>
+	void for_each( Container& container, Func func )
+	{
+		std::for_each( container.begin(), container.end(), func );
+	}
 
 	// STL—pshuffle‚ÌWrapper
 	template <typename Container >
