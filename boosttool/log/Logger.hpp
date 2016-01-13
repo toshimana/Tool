@@ -55,6 +55,6 @@ namespace boosttool
 		}
 
 	private:
-		const std::string& appName;
+		const std::string appName;
 	};
 }
