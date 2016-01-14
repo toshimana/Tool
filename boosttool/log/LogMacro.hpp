@@ -7,3 +7,4 @@
 
 #define ERROR_READ( file )  ERROR_LOG( ( boost::format( "fail to read : %s" ) % file ).str() )
 #define ERROR_PARSE( file ) ERROR_LOG( ( boost::format( "fail to parse : %s" ) % file ).str() )
+#define ERROR_INITIALIZE( device ) ERROR_LOG( ( boost::format( "fail to initialize : %s" ) % device ).str() )
