@@ -14,12 +14,12 @@ namespace boosttool
 			: tag( _tag )
 			, timer()
 		{
-			BOOST_LOG_TRIVIAL( info ) << "BEGIN [" << tag << "]" << std::endl;
+			BOOST_LOG_TRIVIAL( info ) << "BEGIN [" << tag << "]";
 		}
 
 		~StopWatch( void ) 
 		{
-			BOOST_LOG_TRIVIAL( info ) << "END   [" << tag << "]" << timer.format() << std::endl;
+			BOOST_LOG_TRIVIAL( info ) << "END   [" << tag << "]" << timer.format( 6, " %ws wall, %us user + %ss system = %ts CPU (%p%)" );
 		}
 	};
 };
