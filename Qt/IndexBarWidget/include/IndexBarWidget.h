@@ -2,7 +2,8 @@
 #define INDEXBARWIDGET_H
 
 #include <QWidget>
-#include "ui_IndexBarWidget.h"
+#include <memory>
+#include <functional>
 
 class IndexBarWidget : public QWidget
 {
@@ -12,8 +13,16 @@ public:
 	IndexBarWidget(QWidget *parent = 0);
 	~IndexBarWidget();
 
+	void setMaximum( int maxSize );
+
+	void connectChangedIndex( std::function<void(int)> func );
+
+private slots:
+	void valueChanged( int value );
+
 private:
-	Ui::IndexBarWidget ui;
+	struct Impl;
+	std::unique_ptr<Impl> mImpl;
 };
 
 #endif // INDEXBARWIDGET_H
