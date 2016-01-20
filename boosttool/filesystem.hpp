@@ -3,13 +3,27 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 
-// http://stackoverflow.com/questions/10167382/boostfilesystem-get-relative-path
-template < >
-boost::filesystem::path& boost::filesystem::path::append< typename boost::filesystem::path::iterator >( typename path::iterator begin, typename path::iterator end, const codecvt_type& cvt)
+
+namespace boost
 {
-	for( ; begin != end ; ++begin )
-		*this /= *begin;
-	return *this;
+	namespace filesystem
+	{
+		// http://stackoverflow.com/questions/10167382/boostfilesystem-get-relative-path
+		template < >
+		path& path::append<path::iterator>( path::iterator begin, path::iterator end, const codecvt_type& cvt)
+		{
+			for( ; begin != end ; ++begin )
+				*this /= *begin;
+			return *this;
+		}
+		template < >
+		path& path::append<path::iterator>( path::iterator begin, path::iterator end )
+		{
+			for( ; begin != end ; ++begin )
+				*this /= *begin;
+			return *this;
+		}
+	}
 }
 
 namespace boosttool
