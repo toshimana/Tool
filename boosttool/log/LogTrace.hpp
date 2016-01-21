@@ -12,13 +12,13 @@ namespace {
 	using namespace stltool;
 	
 	// 可変長引数を文字列に変換するクラス
-	std::string LogTraceString( std::stringstream& ss ){ return ss.str(); }
+	std::string LogTraceString( void ){ return ""; }
 	
 	template <typename Arg1>
-	std::string LogTraceString( std::stringstream& ss, const Arg1& arg1 ){ ss << ',' << arg1; return ss.str(); }
+	std::string LogTraceString( const Arg1& arg1 ){ std::stringstream ss; ss << ',' << arg1; return ss.str(); }
 
 	template <typename Arg1,typename Arg2>
-	std::string LogTraceString( std::stringstream& ss,const Arg1& arg1, const Arg2& arg2 ) { ss << ',' << arg1; return LogTraceString( ss, arg2 ); }
+	std::string LogTraceString( const Arg1& arg1, const Arg2& arg2 ) { std::stringstream ss; ss << ',' << arg1 << ',' << arg2; return ss.str(); }
 
 
 	// LogTraceクラス
@@ -45,5 +45,4 @@ namespace {
 	};
 }
 
-//#define LOGTRACE(...) LogTrace logTrace( __FILE__, __LINE__, __FUNCTION__, LogTraceString( "", __VA_ARGS__ ) )
-#define LOGTRACE(...) LogTrace logTrace( __FILE__, __LINE__, __FUNCTION__, "" )
+#define LOGTRACE(...) LogTrace logTrace( __FILE__, __LINE__, __FUNCTION__, LogTraceString( __VA_ARGS__ ) )
