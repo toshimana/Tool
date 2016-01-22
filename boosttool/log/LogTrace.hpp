@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include <string>
+#include <sstream>
 #include <boost/log/trivial.hpp>
 #include "../../stltool/ostream.hpp"
 
