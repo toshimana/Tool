@@ -3,6 +3,7 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/thread.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
@@ -19,7 +20,8 @@ namespace boosttool
 			, time( _time )
 		{
 			setting();
-			th.swap( boost::scoped_ptr<boost::thread>( new boost::thread( [this](){ io.run(); } ) ) );
+			boost::scoped_ptr<boost::thread> p( new boost::thread( [this](){ io.run(); } ) );
+			th.swap( p );
 		}
 
 		~RepeatTimer( void )
