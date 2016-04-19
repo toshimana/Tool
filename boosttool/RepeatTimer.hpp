@@ -20,7 +20,7 @@ namespace boosttool
 			, time( _time )
 		{
 			setting();
-			boost::scoped_ptr<boost::thread> p( new boost::thread( [this](){ io.run(); } ) );
+			boost::scoped_ptr<boost::thread> p( new boost::thread( boost::bind( &RepeatTimer::run_io, this ) ) );
 			th.swap( p );
 		}
 
@@ -49,5 +49,10 @@ namespace boosttool
 		Func func;
 		const boost::posix_time::time_duration time;
 		boost::scoped_ptr<boost::thread> th;
+		
+		void run_io( void )
+		{
+			io.run();
+		}
 	};
 };
