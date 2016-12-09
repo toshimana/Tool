@@ -18,8 +18,8 @@ public:
 	double
 	getScale( void ) const;
 
-	void
-	connectChangedScale( std::function<void (const double)> func );
+signals:
+	void scaleChanged(double);
 
 protected:
 	void createTransformMatrix( void );

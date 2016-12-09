@@ -1,8 +1,6 @@
 #include "ImageWidget.h"
 #include "QCVImage.h"
 
-#include <boost/signals2/signal.hpp>
-
 #include <QtDebug>
 #include <QMouseEvent>
 #include <array>
@@ -35,8 +33,6 @@ namespace
 struct ImageWidget::Impl
 {
 	ImageWidget* base;
-
-	boost::signals2::signal<void (const double)>   changedScale;
 
 	int     scaleIndex;          //拡大率テーブルのインデックス
 	QPointF scaleChangePosition; //拡大・縮小時の中心位置
@@ -109,7 +105,7 @@ ImageWidget::setScaleIndex( const int index )
 	} else {
 		mImpl->scaleIndex = index;
 	}
-	mImpl->changedScale( scaleTable[mImpl->scaleIndex] );
+	scaleChanged( scaleTable[mImpl->scaleIndex] );
 	mImpl->createTransformMatrix();
 }
 
@@ -123,12 +119,6 @@ double
 ImageWidget::getScale( void ) const
 {
 	return scaleTable[mImpl->scaleIndex];
-}
-
-void
-ImageWidget::connectChangedScale( std::function<void (const double)> func )
-{
-	mImpl->changedScale.connect( func );
 }
 
 void

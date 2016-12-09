@@ -9,6 +9,14 @@ ImageWidgetBase::ImageWidgetBase( QWidget* parent )
 	// マウスをクリックしていない時でも
 	// mouseMoveEventが反応するように設定する
 	setMouseTracking( true );
+
+	connect( this, &ImageWidgetBase::pointClickedWithEvent,[this](const cv::Point& p, QMouseEvent* event){
+		pointClicked(p);
+	});
+
+	connect( this, &ImageWidgetBase::mouseMovedWithEvent, [this](const cv::Point& p, QMouseEvent* event){
+		mouseMoved(p);
+	});
 }
 
 ImageWidgetBase::~ImageWidgetBase( void )
@@ -27,7 +35,7 @@ ImageWidgetBase::setImage( cv::InputArray src, const int index )
 
 	// メイン画像が更新されたなら、接続関数を実行する
 	if ( index == 0 ) {
-		changedImage( displayImages[index]->getRawImage() );
+		imageChanged( displayImages[index]->getRawImage() );
 	}
 }
 
@@ -35,6 +43,15 @@ cv::Mat
 ImageWidgetBase::getImage( const int index )
 {
 	return displayImages[index]->getRawImage();
+}
+
+void
+ImageWidgetBase::clearImage()
+{
+	displayImages.clear();
+	displayImages.resize(1, QCVImage::create(cv::Mat()));
+
+	createTransformMatrix();
 }
 
 // 以下の値が変更されたときに実行する 
@@ -77,44 +94,31 @@ ImageWidgetBase::resizeEvent( QResizeEvent* event )
 }
 
 void
-ImageWidgetBase::connectClickedPoint( std::function<void (const QPoint&)> func )
-{
-	changedClickedPointOnImage.connect( func );
-}
-
-void
-ImageWidgetBase::connectChangedMouseMove( std::function<void (const QPoint&)> func )
-{
-	changedMouseMovePointOnImage.connect( func );
-}
-
-void
-ImageWidgetBase::connectChangedImage( std::function<void (const cv::Mat&)> func )
-{
-	changedImage.connect( func );
-}
-
-void
 ImageWidgetBase::mousePressEvent( QMouseEvent* event )
 {
-	switch ( event->button() ) {
-	case Qt::LeftButton:
-		{
-			qreal postX, postY;
-			matrix.inverted().map( event->x(), event->y(), &postX, &postY );
-			changedClickedPointOnImage( QPoint( floor( postX ), floor( postY ) ) );
-		} break;
+	cv::Mat rawImage = displayImages[0]->getRawImage();
+	if (!(rawImage.empty())) {
+		qreal postX, postY;
+		matrix.inverted().map(event->x(), event->y(), &postX, &postY);
+
+		cv::Rect region(cv::Point(), rawImage.size());
+		cv::Point p(floor(postX), floor(postY));
+		if (region.contains(p))	pointClickedWithEvent(p, event);
 	}
 }
 
 void
 ImageWidgetBase::mouseMoveEvent( QMouseEvent* event )
 {
-	if ( !( displayImages[0]->getRawImage().empty() ) ) {
+	cv::Mat rawImage = displayImages[0]->getRawImage();
+	if ( !( rawImage.empty() ) ) {
 		// 画像上の座標を出力する
 		qreal postX, postY;
 		matrix.inverted().map( event->x(), event->y(), &postX, &postY );
-		changedMouseMovePointOnImage( QPoint( floor( postX ), floor( postY ) ) );
+
+		cv::Rect region(cv::Point(), rawImage.size());
+		cv::Point p(floor(postX), floor(postY));
+		if ( region.contains(p)) mouseMovedWithEvent(p, event);
 	}
 }
 
